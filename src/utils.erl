@@ -8,6 +8,7 @@
 -module(utils).
 
 -export([perform/1]).
+-export([get_env/1]).
 -export([filepath/2]).
 
 -include("utils").
@@ -33,7 +34,10 @@ perform(Funs) ->
 	end,
 	lists:foldl(MakeResults, [#result{}], Funs).
 
+get_env(Pars) -> lists:flatten([fun() -> case application:get_env(Par) of
+	{ok, Val} -> {Par, Val}; undefined -> [] end end() || Par <- Pars]).
+
 filepath(FileName, Module) -> case filename:pathtype(FileName) of
 	absolute -> FileName;
-	relative -> filename:dirname(code:which(Module)) ++ "/" ++ FileName
+	relative -> filename:join(filename:dirname(code:which(Module)), FileName)
 end.
