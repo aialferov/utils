@@ -5,15 +5,12 @@
 %%% Created : 22 Aug 2012 by Anton I Alferov <casper@ubca-dp>
 %%%-------------------------------------------------------------------
 
--module(utils).
+-module(utils_monad).
+-export([do/1]).
 
--export([perform/1]).
--export([get_env/1]).
--export([filepath/2]).
+-include("utils_monad.hrl").
 
--include("utils").
-
-perform(Funs) ->
+do(Funs) ->
 	MapArgs = fun(Args, Results) -> lists:map(
 		fun (#placeholder{id = ID}) ->
 				(lists:keyfind(ID, 2, Results))#result.data;
@@ -33,11 +30,3 @@ perform(Funs) ->
 		(_Fun, Result) -> Result
 	end,
 	lists:foldl(MakeResults, [#result{}], Funs).
-
-get_env(Pars) -> lists:flatten([fun() -> case application:get_env(Par) of
-	{ok, Val} -> {Par, Val}; undefined -> [] end end() || Par <- Pars]).
-
-filepath(FileName, Module) -> case filename:pathtype(FileName) of
-	absolute -> FileName;
-	relative -> filename:join(filename:dirname(code:which(Module)), FileName)
-end.
