@@ -1,3 +1,10 @@
+%%%-------------------------------------------------------------------
+%%% @author Anton I Alferov <casper@ubca-dp>
+%%% @copyright (C) 2013, Anton I Alferov
+%%%
+%%% Created: 21 Oct 2012 by Anton I Alferov <casper@ubca-dp>
+%%%-------------------------------------------------------------------
+
 -module(utils_http).
 
 -export([read_query/1]).

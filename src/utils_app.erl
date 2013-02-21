@@ -1,3 +1,10 @@
+%%%-------------------------------------------------------------------
+%%% @author Anton I Alferov <casper@ubca-dp>
+%%% @copyright (C) 2013, Anton I Alferov
+%%%
+%%% Created: 7 Dec 2012 by Anton I Alferov <casper@ubca-dp>
+%%%-------------------------------------------------------------------
+
 -module(utils_app).
 -export([get_env/1, get_key/1]).
 
