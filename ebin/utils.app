@@ -15,5 +15,5 @@
 		utils_monad
 	]},
 	{registered, []},
-	{applications, [kernel, stdlib]},
+	{applications, [kernel, stdlib]}
 ]}.
