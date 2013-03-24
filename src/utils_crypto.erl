@@ -6,7 +6,7 @@
 %%%-------------------------------------------------------------------
 
 -module(utils_crypto).
--export([generate_nonce/1]).
+-export([generate_nonce/1, hex/1]).
 
 generate_nonce(Format) ->
 	F = fun(X) -> hex(binary_to_list(crypto:rand_bytes(X))) end,
