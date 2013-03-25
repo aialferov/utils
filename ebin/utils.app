@@ -5,14 +5,16 @@
 {application, utils, [
 	{id, "utils"},
 	{vsn, "0.0.1"},
-	{description, "Utils."},
+	{description, "Functions of common use."},
 	{modules, [
 		utils_app,
 		utils_bench,
 		utils_crypto,
 		utils_file,
 		utils_http,
-		utils_monad
+		utils_lists,
+		utils_monad,
+		utils_string
 	]},
 	{registered, []},
 	{applications, [kernel, stdlib]}
