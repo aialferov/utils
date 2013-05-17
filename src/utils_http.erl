@@ -7,8 +7,9 @@
 
 -module(utils_http).
 
+-export([url/2, url/3]).
 -export([read_query/1]).
--export([header_string/1, query_string/1]).
+-export([header_string/1, header_string/2, query_string/1, query_string/2]).
 
 read_query(Query) -> read_query(Query, [], []).
 
@@ -23,11 +24,23 @@ read_query([], Item, Query) ->
 complete_query_item(Item, [Field|Query]) ->
 	[{lists:reverse(Field), http_uri:decode(lists:reverse(Item))}|Query].
 
-query_string(Params) -> kv_string(Params, fun(K, V, Acc) ->
+query_string(Params) -> query_string(Params, []).
+query_string(Params, Encode) -> kv_string(Params, Encode, fun({K, V}, Acc) ->
 	[Acc, case Acc of [] -> []; Acc -> "&" end, K, "=", V] end).
 
-header_string(Params) -> kv_string(Params, fun(K, V, Acc) ->
+header_string(Params) -> header_string(Params, []).
+header_string(Params, Encode) -> kv_string(Params, Encode, fun({K, V}, Acc) ->
 	[Acc, case Acc of [] -> []; Acc -> ", " end, K, "=", "\"", V, "\""] end).
 
-kv_string(Params, Builder) -> lists:foldl(fun({K, V}, Acc) ->
-	lists:append(Builder(K, V, Acc)) end, [], Params).
+kv_string(Params, Encode, Builder) -> lists:foldl(fun(Pair, Acc) ->
+	lists:append(Builder(encode(Pair, Encode), Acc)) end, [], Params).
+
+encode({K, V}, encode_k) -> {http_uri:encode(K), V};
+encode({K, V}, encode_v) -> {K, http_uri:encode(V)};
+encode({K, V}, encode) -> {http_uri:encode(K), http_uri:encode(V)};
+encode(Pair, []) -> Pair.
+
+url(Url, []) -> Url;
+url(Url, Params) -> Url ++ "?" ++ utils_http:query_string(Params).
+url(Url, Params, []) -> url(Url, Params);
+url(Url, Params, ParamString) -> url(Url, Params) ++ "&" ++ ParamString.

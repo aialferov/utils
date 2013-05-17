@@ -6,7 +6,7 @@
 %%%-------------------------------------------------------------------
 
 -module(utils_monad).
--export([do/1]).
+-export([do/1, do_simple/1]).
 
 -include("utils_monad.hrl").
 
@@ -30,3 +30,8 @@ do(Funs) ->
 		(_Fun, Result) -> Result
 	end,
 	lists:foldl(MakeResults, [#result{}], Funs).
+
+do_simple(Funs) -> lists:foldl(fun
+	(Fun, ok) -> Fun();
+	(_Fun, {error, Reason}) -> {error, Reason}
+end, ok, Funs).

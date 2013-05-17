@@ -5,7 +5,7 @@
 {application, utils, [
 	{id, "utils"},
 	{vsn, "0.0.1"},
-	{description, "Functions of common use."},
+	{description, "Functions of common use"},
 	{modules, [
 		utils_app,
 		utils_bench,
