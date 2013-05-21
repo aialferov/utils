@@ -28,7 +28,7 @@ query_string(Params) -> query_string(Params, no_encode).
 query_string(Params, Encode) -> kv_string(Params, Encode, fun({K, V}, Acc) ->
 	[Acc, case Acc of [] -> []; Acc -> "&" end, K, "=", V] end).
 
-header_string(Params) -> header_string(Params, []).
+header_string(Params) -> header_string(Params, no_encode).
 header_string(Params, Encode) -> kv_string(Params, Encode, fun({K, V}, Acc) ->
 	[Acc, case Acc of [] -> []; Acc -> ", " end, K, "=", "\"", V, "\""] end).
 
