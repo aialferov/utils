@@ -8,48 +8,53 @@
 -module(utils_sasl).
 
 -export([plain_message/2]).
--export([digest_md5_response/4, digest_md5_response/5]).
+-export([digest_md5_response/5, digest_md5_response/6]).
 
--define(Qop, "auth").
--define(Charset, "utf-8").
--define(ServType, "xmpp").
+-include("sasl.hrl").
 
--record(challenge, {realm = "", nonce = "", qop = ?Qop,
-	charset = ?Charset, algorithm = "md-sess"}).
+-record(challenge, {realm = "", nonce = "",
+	qop = "", charset = "", algorithm = "md-sess"}).
+
+-define(CNonceFormat, [4, 2, 2, 2, 6]).
 
 plain_message(AuthcID, Passwd) ->
 	binary_to_list(base64:encode([0] ++ AuthcID ++ [0] ++ Passwd)).
 
-digest_md5_response(UserName, Password, Host, Challenge) ->
-	digest_md5_response(UserName, Password, Host, "", Challenge).
+digest_md5_response(UserName, Password, Host, Challenge, Config) ->
+	digest_md5_response(UserName, Password, Host, "", Challenge, Config).
 
-digest_md5_response(UserName, Password, Host, Service, Challenge) ->
-	response(UserName, Password, Host, Service, read_challenge(Challenge)).
+digest_md5_response(UserName, Password, Host, Service, Challenge, Config) ->
+	Qop = Config#digest_md5_config.qop,
+	Charset = Config#digest_md5_config.charset,
+	ServType = Config#digest_md5_config.serv_type,
+	response(UserName, Password, Host, Service, ServType,
+		read_challenge(Challenge, Charset, Qop)).
 
-response(UserName, Password, Host, Service, Challenge) ->
+response(UserName, Password, Host, Service, ServType, Challenge) ->
 	Cnonce = generate_cnonce(),
 	NonceCount = string:right(integer_to_list(1, 16), 8, $0),
-	DigestUri = ?ServType ++ "/" ++ Host ++
+	DigestUri = ServType ++ "/" ++ Host ++
 		case Service of "" -> ""; Service -> "/" ++ Service end,
 
 	binary_to_list(base64:encode(
-		"charset=" ++ ?Charset ++ "," ++
+		"charset=" ++ Challenge#challenge.charset ++ "," ++
 		"username=\"" ++ UserName ++ "\"," ++
 		"realm=\"" ++ Challenge#challenge.realm ++ "\"," ++
 		"nonce=\"" ++ Challenge#challenge.nonce ++ "\"," ++
 		"cnonce=\"" ++ Cnonce ++ "\"," ++
 		"nc=" ++ NonceCount ++ "," ++
-		"qop=" ++ ?Qop ++ "," ++
+		"qop=" ++ Challenge#challenge.qop ++ "," ++
 		"digest-uri=\"" ++ DigestUri ++ "\"," ++
 		"response=" ++ response(UserName, Password,
 			Challenge#challenge.realm, Challenge#challenge.nonce,
-			Cnonce, NonceCount, ?Qop, DigestUri
+			Cnonce, NonceCount, Challenge#challenge.qop, DigestUri
 		)
 	)).
 
-response(UserName, Password, Realm,
-	Nonce, Cnonce, NonceCount, Qop, DigestUri) ->
-
+response(
+	UserName, Password, Realm, Nonce,
+	Cnonce, NonceCount, Qop, DigestUri
+) ->
 	A1 = h(UserName ++ ":" ++ Realm ++ ":" ++ Password) ++
 		":" ++ Nonce ++ ":" ++ Cnonce,
 	A2 = "AUTHENTICATE:" ++ DigestUri,
@@ -57,8 +62,9 @@ response(UserName, Password, Realm,
 		Cnonce ++ ":" ++ Qop ++ ":" ++ hex(h(A2)))).
 
 
-read_challenge(Challenge) -> read_challenge(
-	binary_to_list(base64:decode(Challenge)), #challenge{}).
+read_challenge(Challenge, Charset, Qop) ->
+	read_challenge(binary_to_list(base64:decode(Challenge)),
+		#challenge{charset = Charset, qop = Qop}).
 
 read_challenge("realm=\"" ++ T, R) -> gather(realm, T, R);
 read_challenge("nonce=\"" ++ T, R) -> gather(nonce, T, R);
@@ -74,7 +80,7 @@ gather(Name, T, R) ->
 
 gather_tail("\"" ++ T, L) -> {lists:reverse(L), T};
 gather_tail("," ++ T, L) -> {lists:reverse(L), T};
-gather_tail([H|T], L) -> gather_tail(T, [H|L]);                                 
+gather_tail([H|T], L) -> gather_tail(T, [H|L]);
 gather_tail([], L) -> {lists:reverse(L), []}.
 
 challenge_field_index(realm) -> #challenge.realm;
@@ -85,14 +91,6 @@ challenge_field_index(algorithm) -> #challenge.algorithm.
 
 h(String) -> binary_to_list(crypto:md5(String)).
 kd(HexK, HexD) -> h(HexK ++ ":" ++ HexD).
-hex([H|T]) -> [digit(H bsr 4), digit(H band 16#f) | hex(T)];                    
-hex([]) -> [].                                                                  
-                                                                                
-digit(N) when N < 10 -> $0 + N;                                                 
-digit(N) -> $a + N - 10.
 
-generate_cnonce() ->
-	F = fun(X) -> hex(binary_to_list(crypto:rand_bytes(X))) end,
-	lists:foldl(fun(X, []) -> F(X);
-		(X, Acc) -> Acc ++ "-" ++ F(X) end, [], [4, 2, 2, 2, 6]).
-
+generate_cnonce() -> utils_crypto:generate_nonce(?CNonceFormat).
+hex(L) -> utils_crypto:hex(L).

@@ -1,0 +1,1 @@
+-record(digest_md5_config, {qop, charset, serv_type}).
