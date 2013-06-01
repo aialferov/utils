@@ -10,7 +10,7 @@
 -export([plain_message/2]).
 -export([digest_md5_response/5, digest_md5_response/6]).
 
--include("sasl.hrl").
+-include("utils_sasl.hrl").
 
 -record(challenge, {realm = "", nonce = "",
 	qop = "", charset = "", algorithm = "md-sess"}).
