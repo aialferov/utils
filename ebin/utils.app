@@ -14,7 +14,8 @@
 		utils_http,
 		utils_lists,
 		utils_monad,
-		utils_string
+		utils_string,
+		utils_test
 	]},
 	{registered, []},
 	{applications, [kernel, stdlib]}
