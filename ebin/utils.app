@@ -10,6 +10,7 @@
 		utils_app,
 		utils_bench,
 		utils_crypto,
+		utils_email,
 		utils_file,
 		utils_http,
 		utils_lists,
