@@ -6,7 +6,18 @@
 %%%-------------------------------------------------------------------
 
 -module(utils_string).
+
+-export([read_word/1]).
 -export([sub/3]).
+
+read_word(String) -> read_word(String, []).
+read_word(" " ++ T, Word) -> read_word(sep, T, Word);
+read_word("\n" ++ T, Word) -> read_word(sep, T, Word);
+read_word("\r" ++ T, Word) -> read_word(sep, T, Word);
+read_word([H|T], Word) -> read_word(T, [H|Word]);
+read_word([], Word) -> {lists:reverse(Word), []}.
+read_word(sep, T, []) -> read_word(T, []);
+read_word(sep, T, Word) -> {lists:reverse(Word), T}.
 
 sub(Str, Old, New) -> sub(Str, Old, New, string:str(Str, Old)).
 sub(Str, _, _, 0) -> Str;
