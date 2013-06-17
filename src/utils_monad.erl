@@ -13,7 +13,7 @@
 do(Funs) ->
 	MapArgs = fun(Args, Results) -> lists:map(
 		fun (#placeholder{id = ID}) ->
-				(lists:keyfind(ID, 2, Results))#result.data;
+				(lists:keyfind(ID, #result.id, Results))#result.data;
 			(Other) -> Other
 		end, Args
 	) end,
