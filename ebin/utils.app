@@ -18,6 +18,5 @@
 		utils_string,
 		utils_test
 	]},
-	{registered, []},
 	{applications, [kernel, stdlib]}
 ]}.
