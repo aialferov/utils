@@ -7,16 +7,19 @@
 	{vsn, "0.0.1"},
 	{description, "Functions of common use"},
 	{modules, [
+		utils,
 		utils_app,
-		utils_bench,
-		utils_crypto,
-		utils_email,
 		utils_file,
 		utils_http,
+		utils_sasl,
+		utils_test,
+		utils_tree,
+		utils_bench,
+		utils_email,
 		utils_lists,
 		utils_monad,
-		utils_string,
-		utils_test
+		utils_crypto,
+		utils_string
 	]},
 	{applications, [kernel, stdlib]}
 ]}.
