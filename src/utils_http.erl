@@ -11,6 +11,8 @@
 -export([read_query/1]).
 -export([header_string/1, header_string/2, query_string/1, query_string/2]).
 
+-export([b64_encode/1]).
+
 read_query(Query) -> read_query(Query, [], []).
 
 read_query("=" ++ T, Item, Query) -> read_query(T, [], [Item|Query]);
@@ -48,3 +50,8 @@ url(Url, Params, ParamString) -> url(Url, Params, ParamString, no_encode).
 url(Url, Params, [], Encode) -> url(Url, Params, Encode);
 url(Url, Params, ParamString, Encode) ->
 	url(Url, Params, Encode) ++ "&" ++ ParamString.
+
+b64_encode(S) -> b64_encode(S, lists:reverse(S), []).
+b64_encode(S, "=" ++ Rest, Acc) -> b64_encode(S, Rest, "%3D" ++ Acc);
+b64_encode(S, _Rest, []) -> S;
+b64_encode(_S, Rest, Acc) -> lists:reverse(Rest) ++ Acc.
