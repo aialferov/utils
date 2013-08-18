@@ -13,7 +13,6 @@
 		utils_http,
 		utils_sasl,
 		utils_test,
-		utils_tree,
 		utils_bench,
 		utils_email,
 		utils_lists,
