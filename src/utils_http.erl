@@ -12,6 +12,7 @@
 -export([header_string/1, header_string/2, query_string/1, query_string/2]).
 
 -export([b64_encode/1]).
+-export([uri_encode/1, uri_decode/1]).
 
 read_query(Query) -> read_query(Query, [], []).
 
@@ -24,7 +25,7 @@ read_query([], Item, Query) ->
 	lists:reverse(complete_query_item(Item, Query)).
 
 complete_query_item(Item, [Field|Query]) ->
-	[{lists:reverse(Field), http_uri:decode(lists:reverse(Item))}|Query].
+	[{lists:reverse(Field), uri_decode(lists:reverse(Item))}|Query].
 
 query_string(Params) -> query_string(Params, no_encode).
 query_string(Params, Encode) -> kv_string(Params, Encode, fun({K, V}, Acc) ->
@@ -37,9 +38,9 @@ header_string(Params, Encode) -> kv_string(Params, Encode, fun({K, V}, Acc) ->
 kv_string(Params, Encode, Builder) -> lists:foldl(fun(Pair, Acc) ->
 	lists:append(Builder(encode(Pair, Encode), Acc)) end, [], Params).
 
-encode({K, V}, encode_key) -> {http_uri:encode(K), V};
-encode({K, V}, encode_value) -> {K, http_uri:encode(V)};
-encode({K, V}, encode) -> {http_uri:encode(K), http_uri:encode(V)};
+encode({K, V}, encode_key) -> {uri_encode(K), V};
+encode({K, V}, encode_value) -> {K, uri_encode(V)};
+encode({K, V}, encode) -> {uri_encode(K), uri_encode(V)};
 encode(Pair, no_encode) -> Pair.
 
 url(Url, Params) -> url(Url, Params, no_encode).
@@ -55,3 +56,11 @@ b64_encode(S) -> b64_encode(S, lists:reverse(S), []).
 b64_encode(S, "=" ++ Rest, Acc) -> b64_encode(S, Rest, "%3D" ++ Acc);
 b64_encode(S, _Rest, []) -> S;
 b64_encode(_S, Rest, Acc) -> lists:reverse(Rest) ++ Acc.
+
+uri_encode(S) -> uri_encode(http_uri:encode(S), []).
+uri_encode("\r" ++ T, Acc) -> uri_encode(T, [$D,$0,$%|Acc]);
+uri_encode("\n" ++ T, Acc) -> uri_encode(T, [$A,$0,$%|Acc]);
+uri_encode([H|T], Acc) -> uri_encode(T, [H|Acc]);
+uri_encode([], Acc) -> lists:reverse(Acc).
+
+uri_decode(S) -> http_uri:decode(S).
