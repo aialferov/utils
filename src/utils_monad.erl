@@ -10,6 +10,7 @@
 
 -include("utils_monad.hrl").
 
+do([]) -> [];
 do(Funs) ->
 	MapArgs = fun(Args, Results) -> lists:map(
 		fun (#placeholder{id = ID}) ->
