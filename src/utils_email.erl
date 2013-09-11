@@ -6,10 +6,21 @@
 %%%-------------------------------------------------------------------
 
 -module(utils_email).
+
+-export([local_part/1, domain/1]).
 -export([normalize_address/1]).
 
 -define(AddressRx, "^[A-Za-z0-9_%+.-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,4}$").
 -define(AddressCharRx, "[A-Za-z0-9_%@+.-]").
+
+local_part(Address) -> local_part(Address, []).
+local_part("@" ++ _, Acc) -> lists:reverse(Acc);
+local_part([H|T], Acc) -> local_part(T, [H|Acc]);
+local_part([], Acc) -> lists:reverse(Acc).
+
+domain("@" ++ T) -> T;
+domain([_|T]) -> domain(T);
+domain([]) -> [].
 
 normalize_address(Address) -> normalize_address(Address, []).
 normalize_address([H|T], Acc) -> case re:run([H], ?AddressCharRx) of
