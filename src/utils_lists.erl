@@ -40,4 +40,5 @@ to_lower([208,H|T], Acc) -> to_lower(T, case H of
 	H -> [H,208|Acc]
 end);
 to_lower([H], Acc) -> lists:reverse([H|Acc]);
+to_lower([H|T], Acc) -> to_lower(T, [H|Acc]);
 to_lower([], Acc) -> lists:reverse(Acc).
