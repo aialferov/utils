@@ -68,6 +68,6 @@ uri_encode([], Acc) -> lists:reverse(Acc).
 uri_decode(S) -> http_uri:decode(S).
 
 secure_path(Path) -> secure_path(Path, []).
-secure_path("../" ++ T, _Acc) -> secure_path(T, []);
+secure_path("../" ++ T, _Acc) -> secure_path(T, [$/]);
 secure_path([H|T], Acc) -> secure_path(T, [H|Acc]);
 secure_path([], Acc) -> lists:reverse(Acc).
