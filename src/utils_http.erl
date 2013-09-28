@@ -14,6 +14,8 @@
 -export([b64_encode/1]).
 -export([uri_encode/1, uri_decode/1]).
 
+-export([secure_path/1]).
+
 read_query(Query) -> read_query(Query, [], []).
 
 read_query("=" ++ T, Item, Query) -> read_query(T, [], [Item|Query]);
@@ -64,3 +66,8 @@ uri_encode([H|T], Acc) -> uri_encode(T, [H|Acc]);
 uri_encode([], Acc) -> lists:reverse(Acc).
 
 uri_decode(S) -> http_uri:decode(S).
+
+secure_path(Path) -> secure_path(Path, []).
+secure_path("../" ++ T, _Acc) -> secure_path(T, []);
+secure_path([H|T], Acc) -> secure_path(T, [H|Acc]);
+secure_path([], Acc) -> lists:reverse(Acc).
