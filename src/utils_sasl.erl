@@ -89,7 +89,7 @@ challenge_field_index(qop) -> #challenge.qop;
 challenge_field_index(charset) -> #challenge.charset;
 challenge_field_index(algorithm) -> #challenge.algorithm.
 
-h(String) -> binary_to_list(crypto:md5(String)).
+h(String) -> binary_to_list(crypto:hash(md5, String)).
 kd(HexK, HexD) -> h(HexK ++ ":" ++ HexD).
 
 generate_cnonce() -> utils_crypto:generate_nonce(?CNonceFormat).
