@@ -21,7 +21,5 @@ read_word(sep, T, Word) -> {lists:reverse(Word), T}.
 
 sub(Str, Old, New) -> sub(Str, Old, New, string:str(Str, Old)).
 sub(Str, _, _, 0) -> Str;
-sub(Str, Old, New, I) ->
-	NewStr = string:left(Str, I - 1) ++ New ++
-		string:right(Str, string:len(Str) - I + 1 - string:len(Old)),
-	sub(NewStr, Old, New, string:str(NewStr, Old)).
+sub(Str, Old, New, I) -> sub(string:left(Str, I - 1) ++ New ++
+	string:right(Str, string:len(Str) - I + 1 - string:len(Old)), Old, New).
