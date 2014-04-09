@@ -11,10 +11,15 @@
 -export([read_query/1]).
 -export([header_string/1, header_string/2, query_string/1, query_string/2]).
 
+-export([basic_auth_header/2]).
+
 -export([b64_encode/1]).
 -export([uri_encode/1, uri_decode/1]).
 
 -export([secure_path/1]).
+
+-define(BasicAuthHeader(Credentials),
+	{"Authorization", "Basic " ++ Credentials}).
 
 read_query(Query) -> read_query(Query, [], []).
 
@@ -53,6 +58,9 @@ url(Url, Params, ParamString) -> url(Url, Params, ParamString, no_encode).
 url(Url, Params, [], Encode) -> url(Url, Params, Encode);
 url(Url, Params, ParamString, Encode) ->
 	url(Url, Params, Encode) ++ "&" ++ ParamString.
+
+basic_auth_header(UserID, Password) ->
+	?BasicAuthHeader(base64:encode_to_string(UserID ++ ":" ++ Password)).
 
 b64_encode(S) -> b64_encode(S, lists:reverse(S), []).
 b64_encode(S, "=" ++ Rest, Acc) -> b64_encode(S, Rest, "%3D" ++ Acc);
