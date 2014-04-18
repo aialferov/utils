@@ -7,16 +7,20 @@
 
 -module(utils_lists).
 
--export([keyfind/2, keyfind2/2]).
+-export([keyfind/2, value/2, value/3]).
 -export([to_lower/1, to_upper/1]).
 
-keyfind(Key, List) -> keyfind(v1, Key, List).
-keyfind2(Key, List) -> keyfind(v2, Key, List).
+keyfind(Key, List) -> case lists:keyfind(Key, 1, List) of
+	{Key, Value} -> {ok, Value}; false -> {error, not_found} end.
 
-keyfind(V, Key, List) -> case lists:keyfind(Key, 1, List) of
-	{Key, Value} -> case V of v1 -> {ok, Value}; v2 -> Value end;
-	false -> case V of v1 -> {error, not_found}; v2 -> false end
-end.
+value(Key, List) -> value(Key, List, false).
+value(Key, List, MfaOrFun) -> case lists:keyfind(Key, 1, List) of
+	{Key, Value} -> Value; false -> value(MfaOrFun) end.
+
+value({F, A}) -> apply(F, A);
+value({M, F, A}) -> apply(M, F, A);
+value(F) when is_function(F) -> F();
+value(_) -> false.
 
 to_upper(S) -> to_upper(S, []).
 to_upper([H1,H2|T], Acc) -> to_upper(T, case {H1,H2} of
