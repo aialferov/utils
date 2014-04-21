@@ -8,7 +8,7 @@
 -module(utils_string).
 
 -export([read_word/1]).
--export([sub/3]).
+-export([sub/2, sub/3]).
 
 read_word(String) -> read_word(String, []).
 read_word(" " ++ T, Word) -> read_word(sep, T, Word);
@@ -19,6 +19,7 @@ read_word([], Word) -> {lists:reverse(Word), []}.
 read_word(sep, T, []) -> read_word(T, []);
 read_word(sep, T, Word) -> {lists:reverse(Word), T}.
 
+sub({Old, New}, Str) -> sub(Str, Old, New).
 sub(Str, Old, New) -> sub(Str, Old, New, string:str(Str, Old)).
 sub(Str, _, _, 0) -> Str;
 sub(Str, Old, New, I) -> sub(string:left(Str, I - 1) ++ New ++
