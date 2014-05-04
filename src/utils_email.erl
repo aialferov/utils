@@ -14,11 +14,11 @@
 -define(AddressCharRx, "[A-Za-z0-9_%@+.-]").
 
 local_part(Address) -> local_part(Address, []).
-local_part("@" ++ _, Acc) -> lists:reverse(Acc);
+local_part([$@|_], Acc) -> lists:reverse(Acc);
 local_part([H|T], Acc) -> local_part(T, [H|Acc]);
 local_part([], Acc) -> lists:reverse(Acc).
 
-domain("@" ++ T) -> T;
+domain([$@|T]) -> T;
 domain([_|T]) -> domain(T);
 domain([]) -> [].
 
